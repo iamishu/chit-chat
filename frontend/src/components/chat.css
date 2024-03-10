@@ -1,0 +1,12 @@
+span.message-head:after {
+    content: "";
+    position: absolute;
+    width: 0;
+    height: 0;
+    left: -6px;
+    right: auto;
+    top: 0px;
+    bottom: auto;
+    border: 8px solid;
+    border-color: #b9f5d0 transparent transparent transparent;
+}
