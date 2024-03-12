@@ -1,3 +1,14 @@
+:root {
+  --bgClr: #f0f2f5;
+  --textClr: #111b21;
+  --brandClr: #3182ce;
+  --borderClr: #000000;
+  --white: #fff;
+  --warningClr: #e75900;
+  --iconClr: #54656f;
+  --chatBg: #eae6df;
+}
+
 * {
   font-family: "Poppins", sans-serif;
   box-sizing: border-box;
@@ -5,13 +16,13 @@
 
 body,
 html {
-  background-color: #f0f2f5 !important;
+  background-color: var(--bgClr) !important;
 }
 
 .App {
   min-height: 100vh;
   display: flex;
-  color: #111b21;
+  color: var(--textClr);
 }
 
 *::-webkit-scrollbar-thumb {
@@ -27,48 +38,3 @@ html {
   width: 6px !important;
   height: 6px !important;
 }
-
-input {
-  border: 0 !important;
-  outline: 0 !important;
-  font-size: 16px !important;
-  border-radius: 320px !important;
-  padding: 16px !important;
-  background-color: transparent !important;
-  min-height: 50px;
-  color: #61677c !important;
-}
-
-input {
-  box-shadow: -5px -5px 5px rgba(92, 92, 92, 0.1),
-    10px 10px 10px rgba(0, 0, 0, 0.4), inset -5px -5px 5px rgba(82, 82, 82, 0.2),
-    inset 10px 10px 10px rgba(0, 0, 0, 0.4);
-  width: 100% !important;
-  box-sizing: border-box !important;
-  transition: all 0.2s ease-in-out !important;
-  appearance: none !important;
-  -webkit-appearance: none !important;
-}
-input:focus,
-input:-webkit-autofill {
-  box-shadow: -5px -5px 5px rgba(92, 92, 92, 0.1),
-    10px 10px 10px rgba(0, 0, 0, 0.4), inset -5px -5px 5px rgba(82, 82, 82, 0.2),
-    inset 10px 10px 10px rgba(0, 0, 0, 0.4) !important;
-  background-color: transparent !important;
-  background-position: 0 0 !important;
-}
-
-/* .home-content button {
-  color: #61677c !important;
-  font-weight: bold !important;
-  box-shadow: -5px -5px 20px #fff, 5px 5px 20px #babecc !important;
-  transition: all 0.2s ease-in-out !important;
-  cursor: pointer !important;
-  font-weight: 600 !important;
-}
-.home-content button:hover {
-  box-shadow: -2px -2px 5px #fff, 2px 2px 5px #babecc !important;
-}
-.home-content button:active {
-  box-shadow: inset 1px 1px 2px #babecc, inset -1px -1px 2px #fff !important;
-} */

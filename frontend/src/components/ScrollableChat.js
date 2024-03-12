@@ -20,10 +20,9 @@ const ScrollableChat = ({ messages }) => {
   };
 
   const renderMessage = (m, i) => {
-    console.log("msg", m);
     if (m?.type && m?.type === "day") {
       return (
-        <Box w="100%" textAlign="center" margin="20px 0 10px">
+        <Box w="100%" textAlign="center" margin="20px 0 10px" key={i + 1}>
           <small
             style={{
               width: "50px",

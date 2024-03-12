@@ -1,6 +1,6 @@
 import React from 'react';
 import { getChatTime, isFirstMessage, isSameSender, isSameSenderMargin, isSameUser } from '../helpers/ChatHelper';
-import { Avatar, Text, Tooltip } from '@chakra-ui/react';
+import { Avatar, Box, Text, Tooltip } from '@chakra-ui/react';
 import "./chat.css";
 import ProfileModal from './Modals/ProfileModal';
 import { ArrowDownIcon } from '@chakra-ui/icons';
@@ -9,7 +9,7 @@ const Message = ({ m, messages, i, user }) => {
     return (
         <div
             style={{ display: "flex", width: "calc(100% - 60px)", margin: "0 auto" }}
-            key={m?._id}
+            key={i + 1}
         >
             {(isSameSender(messages, m, i, user._id) ||
                 isFirstMessage(messages, i, user._id)) && (
@@ -30,7 +30,7 @@ const Message = ({ m, messages, i, user }) => {
                         </Tooltip>
                     </ProfileModal>
                 )}
-            <span
+            <Box
                 style={{
                     backgroundColor: `${m?.sender._id === user._id ? "#BEE3F8" : "#B9F5D0"}`,
                     borderRadius: `${(isSameSender(messages, m, i, user._id) ||
@@ -59,7 +59,14 @@ const Message = ({ m, messages, i, user }) => {
                             </Text>
                         </ProfileModal>
                     )}
-                {m?.content}
+                <Text
+                    className='message'
+                    dangerouslySetInnerHTML={{
+                        __html: m?.content
+                    }}
+                    display="flex"
+                    flexWrap="wrap"
+                />
                 <small
                     style={{
                         width: "100%",
@@ -68,7 +75,7 @@ const Message = ({ m, messages, i, user }) => {
                         color: "#555"
                     }}
                 >{getChatTime(m?.createdAt)}</small>
-            </span>
+            </Box>
         </div>
     )
 }

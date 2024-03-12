@@ -10,3 +10,47 @@ span.message-head:after {
     border: 8px solid;
     border-color: #b9f5d0 transparent transparent transparent;
 }
+
+.msg-box img.emoji-msg {
+    width: 20px;
+    height: 20px;
+}
+
+img.emoji-msg {
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+    vertical-align: text-bottom;
+}
+
+img.emoji-msg.onlyImage {
+    width: 50px;
+    height: 50px;
+    image-rendering: -webkit-optimize-contrast;
+}
+
+.chat-editor {
+    width: 100%;
+    background: var(--white);
+    max-height: 7.75em;
+    padding: 8px 12px 2px !important;
+    border-radius: 10px;
+    outline: none !important;
+    overflow: scroll;
+    font-size: 16px;
+}
+
+.editor-placeholder {
+    position: absolute;
+    left: 80px;
+    color: var(--iconClr);
+    font-size: 14px;
+    z-index: 2;
+    -webkit-user-select: none;
+    user-select: none;
+    pointer-events: none;
+}
+
+.last-message br {
+    display: none;
+}

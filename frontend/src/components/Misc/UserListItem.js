@@ -1,40 +1,22 @@
-import { Avatar, Badge, Box, Text } from "@chakra-ui/react";
+import { Avatar, Badge, Box, Divider, Text } from "@chakra-ui/react";
 import React from "react";
 
 const UserListItem = ({ user, handleFunction, type, groupAdmin }) => {
-  return (
+  return (<>
     <Box
       onClick={handleFunction}
       cursor="pointer"
-      // bg={type === "search" ? "#E8E8E8" : "transparent"}
-      // _hover={{
-      //   background: `${type === "search" ? "teal" : "#E8E8E8"}`,
-      //   color: `${type === "search" ? "white" : "black"}`,
-      // }}
-      w="100%"
-      display="flex"
-      alignItems="center"
-      // color="black"
+      bg={"var(--white)"}
+      color={"var(--textClr)"}
+      _hover={{
+        bg: `#f5f6f6`,
+      }}
       px={3}
       py={2}
-      mb={2}
-      //   borderRadius="lg"
-      boxShadow="-5px -5px 20px rgba(92, 92, 92, 0.1), 5px 5px 20px rgba(0, 0, 0, 0.4)"
-      color="#61677c"
-      bg="transparent"
-      minH="50px"
-      border="2px solid #282828"
-      borderRadius="40px"
-      _hover={{
-        boxShadow:
-          "-2px -2px 5px rgba(92, 92, 92, 0.1), 2px 2px 5px rgba(0, 0, 0, 0.4) !important",
-        color: "#54D8FA",
-      }}
-      _active={{
-        boxShadow:
-          "inset 1px 1px 2px rgba(0, 0, 0, 0.4), inset -1px -1px 2px rgba(92, 92, 92, 0.1) !important",
-        color: "#54D8FA50",
-      }}
+      key={user._id}
+      display="flex"
+      alignItems="center"
+      w="100%"
     >
       <Avatar
         mr={2}
@@ -63,7 +45,8 @@ const UserListItem = ({ user, handleFunction, type, groupAdmin }) => {
         </Text>
       </Box>
     </Box>
-  );
+    <Divider />
+  </>);
 };
 
 export default UserListItem;

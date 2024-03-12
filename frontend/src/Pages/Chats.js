@@ -5,13 +5,19 @@ import { Box } from "@chakra-ui/react";
 import SideDrawer from "../components/Misc/ProfileHead";
 import MyChats from "../components/Misc/MyChats";
 import ChatBox from "../components/Misc/ChatBox";
+import { useNavigate } from "react-router-dom";
 
 const Chats = () => {
   const { user } = ChatState();
   const [fetchAgain, setFetchAgain] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    // fetchChats();
+    const user = JSON.parse(localStorage.getItem("userInfo"));
+
+    if (!user) {
+      navigate("/");
+    }
   }, []);
   return (
     <div style={{ width: "100%" }}>
@@ -23,7 +29,7 @@ const Chats = () => {
           zIndex: 0,
           width: "100%",
           height: "127px",
-          backgroundColor: "teal",
+          backgroundColor: "var(--brandClr)",
         }}
       />
       {/* {user && <SideDrawer />} */}
@@ -34,8 +40,9 @@ const Chats = () => {
         w="calc(100% - 38px)"
         maxW="1600px"
         h="calc(100% - 38px)"
+        maxH="calc(100vh - 38px)"
         m="19px auto 0"
-        boxShadow="0 6px 18px rgba(11,16,20, .05)"
+        boxShadow="0 6px 48px rgba(11,16,20, .3)"
         zIndex="3"
         bg="#f0f2f5"
         position="relative"

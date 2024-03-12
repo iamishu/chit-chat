@@ -46,20 +46,18 @@ const SendVerificationLink = ({
       <Text
         fontSize="25px"
         fontWeight={700}
-        color="#b28e00"
-        textShadow="1px 1px 1px rgba(92, 92, 92, 0.1) !important"
+        color="var(--warningClr)"
         mt="20px"
         textAlign="center"
       >
-        Your account is not verified yet!
+        Your account is not activated yet!
       </Text>
       <Text
-        textShadow="1px 1px 1px rgba(92, 92, 92, 0.1) !important"
         textAlign="center"
-        color="#b28e00"
+        color="var(--textClr)"
         fontSize="14px"
       >
-        Create new verification link by clicking <b>Send Verification Link</b>{" "}
+        Create new verification link by clicking <b style={{ color: "var(--brandClr)" }}>Send Verification Link</b>{" "}
         button.
       </Text>
       <Button
@@ -67,56 +65,12 @@ const SendVerificationLink = ({
         style={{ marginTop: 10 }}
         onClick={handleSendLink}
         isLoading={loading}
-        boxShadow="-5px -5px 20px rgba(92, 92, 92, 0.1), 5px 5px 20px rgba(0, 0, 0, 0.4)"
-        color="#61677c"
-        bg="transparent"
         minH="50px"
-        border="2px solid #282828"
-        borderRadius="40px"
-        _hover={{
-          boxShadow:
-            "-2px -2px 5px rgba(92, 92, 92, 0.1), 2px 2px 5px rgba(0, 0, 0, 0.4) !important",
-          color: "#54D8FA",
-        }}
-        _active={{
-          boxShadow:
-            "inset 1px 1px 2px rgba(0, 0, 0, 0.4), inset -1px -1px 2px rgba(92, 92, 92, 0.1) !important",
-          color: "#54D8FA50",
-        }}
+        borderRadius="10px"
+        colorScheme="blue"
       >
         Send Verification Link
       </Button>
-      <Box position="relative" p={10} w="100%">
-        <Divider borderColor="#61677c" />
-      </Box>
-      <Box w="100%" mt="10px">
-        <Button
-          width="100%"
-          onClick={() => {
-            setActiveComponent("login");
-            setEmailParent("signup");
-            setUser();
-          }}
-          boxShadow="-5px -5px 20px rgba(92, 92, 92, 0.1), 5px 5px 20px rgba(0, 0, 0, 0.4)"
-          color="#61677c"
-          bg="transparent"
-          minH="50px"
-          border="2px solid #282828"
-          borderRadius="40px"
-          _hover={{
-            boxShadow:
-              "-2px -2px 5px rgba(92, 92, 92, 0.1), 2px 2px 5px rgba(0, 0, 0, 0.4) !important",
-            color: "#54D8FA",
-          }}
-          _active={{
-            boxShadow:
-              "inset 1px 1px 2px rgba(0, 0, 0, 0.4), inset -1px -1px 2px rgba(92, 92, 92, 0.1) !important",
-            color: "#54D8FA50",
-          }}
-        >
-          Log Out
-        </Button>
-      </Box>
     </VStack>
   );
 };

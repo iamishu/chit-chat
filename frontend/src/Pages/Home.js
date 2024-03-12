@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { Fade } from "react-animated-components";
 import EmailSent from "./EmailSent";
 import SendVerificationLink from "./SendVerificationLink";
+import ForgotPassword from "../components/Authentication/ForgotPassword";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -31,15 +32,15 @@ const Home = () => {
         justifyContent="center"
         p={3}
         w="100%"
-        m="40px 0"
+        m="20px 0"
         borderRadius="lg"
         borderWidth="0px"
         className="home-content"
       >
         <Text
-          fontSize="3xl"
+          fontSize="20px"
           fontWeight={700}
-          color="#54D8FA"
+          color="var(--brandClr)"
           textAlign="center"
           m="15px 0 0px 0"
           p="25px 25px 0"
@@ -80,6 +81,13 @@ const Home = () => {
                 setActiveComponent={setActiveComponent}
                 emailParent={emailParent}
                 setEmailParent={setEmailParent}
+              />
+            </Fade>
+          )}
+          {activeComponent === "forgot" && (
+            <Fade style={{ padding: "25px" }}>
+              <ForgotPassword
+                setActiveComponent={setActiveComponent}
               />
             </Fade>
           )}

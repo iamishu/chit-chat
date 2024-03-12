@@ -8,24 +8,31 @@ import {
   Avatar,
   Badge,
   StackDivider,
+  Input,
+  Divider,
+  FormControl,
+  InputGroup,
+  InputLeftElement,
+  InputRightElement,
 } from "@chakra-ui/react";
 import axios from "axios";
 import ChatLoading from "./ChatLoading";
-import {
-  getChatTime,
-  getNotificationContent,
-  getSender,
-  getSenderDetail,
-} from "../../helpers/ChatHelper";
-import { GoDotFill } from "react-icons/go";
-import MainDrawer from "../Drawers/MainDrawer";
 import ProfileHead from "./ProfileHead";
+import { CloseIcon, Search2Icon } from "@chakra-ui/icons";
+import UserListItem from "./UserListItem";
+import ChatHeads from "./ChatHeads";
+import { searchChats } from "../../helpers/Filters";
 
 const MyChats = ({ fetchAgain }) => {
   const toast = useToast();
+  const { selectedChat, setSelectedChat, user, chats, setChats } = ChatState();
   const [loggedUser, setLoggedUser] = useState();
   const [loading, setLoading] = useState(false);
-  const { selectedChat, setSelectedChat, user, chats, setChats } = ChatState();
+  const [search, setSearch] = useState();
+  const [searchResult, setSearchResult] = useState([]);
+  const [filteredChats, setFilteredChats] = useState([]);
+  const [loadingChat, setLoadingChat] = useState(false);
+
   const fetchChats = async () => {
     setLoading(true);
     try {
@@ -50,115 +57,156 @@ const MyChats = ({ fetchAgain }) => {
     }
   };
 
+  const handleSearch = async (query) => {
+    setSearch(query);
+    if (!query) {
+      setFilteredChats(chats);
+      return;
+    }
+    try {
+      searchChats(query, chats, loggedUser, setFilteredChats);
+      setLoading(true);
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      };
+
+      const { data } = await axios.get(`/api/user?search=${query}`, config);
+
+      setLoading(false);
+      setSearchResult(data);
+    } catch (error) {
+      toast({
+        title: "Error Occured!",
+        description: "Failed to load the search results.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom-left",
+      });
+    }
+  };
+
+  const accessChat = async (userId) => {
+    try {
+      setLoadingChat(true);
+      const config = {
+        headers: {
+          "Content-type": "application/json",
+          Authorization: `Bearer ${user.token}`,
+        },
+      };
+
+      const { data } = await axios.post("/api/chat", { userId }, config);
+      if (!chats.find((c) => c._id === data._id)) {
+        setChats([data, ...chats]);
+      }
+      setLoadingChat(false);
+      setSelectedChat(data);
+      setSearch("");
+      setSearchResult([]);
+    } catch (error) { }
+  };
+
   useEffect(() => {
     setLoggedUser(JSON.parse(localStorage.getItem("userInfo")));
     fetchChats();
   }, [fetchAgain]);
 
-  console.log("chats", chats);
+  useEffect(() => {
+    setFilteredChats(chats);
+  }, [chats]);
   return (
     <Box
       display={{ base: selectedChat ? "none" : "flex", md: "flex" }}
       flexDir="column"
       alignItems="center"
-      p="0 0 10px"
-      // bg="#191b23"
-      // boxShadow="-5px -5px 20px rgba(92, 92, 92, 0.1), 5px 5px 20px rgba(0, 0, 0, 0.4)"
-      // border="2px solid #282828"
       w={{ base: "100%", md: "31%" }}
-      // borderRadius="20px"
       overflow="hidden"
-      // borderWidth="1px"
     >
       <Box
-        p="15px 0px 10px"
+        p="0px"
         fontSize={{ base: "20px", md: "17px" }}
         width="100%"
         alignItems="center"
         bg="transparent"
-        // boxShadow="-5px -5px 20px rgba(92, 92, 92, 0.1), 5px 5px 20px rgba(0, 0, 0, 0.4)"
-        // borderBottom="2px solid #282828"
       >
         <ProfileHead />
       </Box>
       <Box
         display="flex"
         flexDir="column"
-        // p={3}
         bg="#fff"
         w="100%"
         h="100%"
         overflowY="hidden"
       >
-        {chats && chats.length > 0 ? (
+        <Box w="100%" p={2} bg="var(--white)">
+          <FormControl>
+            <InputGroup>
+              <InputLeftElement h="30px">
+                <Search2Icon color="var(--iconClr)" fontSize="14px" />
+              </InputLeftElement>
+              <Input
+                placeholder="Search Chat"
+                mr={2}
+                value={search}
+                h="30px"
+                fontSize="14px"
+                onChange={(e) => handleSearch(e.target.value)}
+              />
+              <InputRightElement right="10px" height="30px">
+                {search && <CloseIcon color="var(--iconClr)" fontSize="14px" cursor="pointer" onClick={() => setSearch("")} />}
+              </InputRightElement>
+            </InputGroup>
+          </FormControl>
+        </Box>
+        <Divider borderColor="#e9edef" />
+        {(!search && filteredChats) && filteredChats.length > 0 ? (
           <Stack
             overflowY="scroll"
-            divider={<StackDivider borderColor="#e9edef" />}
+            divider={<StackDivider borderColor="#e9edef" m="0px !important" />}
           >
-            {chats.map((chat) => (
-              <Box
-                onClick={() => setSelectedChat(chat)}
-                cursor="pointer"
-                bg={selectedChat === chat ? "#38B2AC" : "#fff"}
-                color={selectedChat === chat ? "white" : "#black"}
-                _hover={{
-                  bg: `${selectedChat !== chat && "#f5f6f6"}`,
-                }}
-                px={3}
-                py={2}
-                // borderRadius="lg"
-                key={chat._id}
-                display="flex"
-                alignItems="center"
-              >
-                <Avatar
-                  name={
-                    !chat.isGroupChat
-                      ? getSender(loggedUser, chat.users)
-                      : chat.chatName
-                  }
-                  src={
-                    !chat.isGroupChat
-                      ? getSenderDetail(user, chat.users).pic
-                      : ""
-                  }
-                  border={
-                    getSenderDetail(user, chat.users).active
-                      ? "2px solid #2ecc71"
-                      : "2px solid #95a5a6"
-                  }
-                  marginRight="10px"
-                />
-                <Text display="flex" flexDir="column" alignItems="flex-start">
-                  {!chat.isGroupChat
-                    ? getSender(loggedUser, chat.users)
-                    : chat.chatName}
-                  {chat.latestMessage && (
-                    <small
-                      style={{
-                        fontSize: "12px",
-                        fontWeight: 600,
-                      }}
-                    >
-                      {getNotificationContent(chat.latestMessage.content)}
-                    </small>
-                  )}
-                </Text>
-                <Text
-                  fontSize={12}
-                  fontWeight={600}
-                  marginLeft="auto"
-                  alignItems="flex-end"
-                >
-                  {getChatTime(chat.updatedAt)}
-                </Text>
-              </Box>
+            {filteredChats.map((chat) => (
+              <ChatHeads chat={chat} loggedUser={loggedUser} />
             ))}
           </Stack>
-        ) : loading ? (
-          <ChatLoading />
-        ) : (
-          <Text>No Chats Available!</Text>
+        ) : search && searchResult.length > 0 ? (<>
+          {filteredChats && filteredChats.length > 0 && (
+            <>
+              {filteredChats.map((chat) =>
+                <ChatHeads chat={chat} loggedUser={loggedUser} />
+              )}
+            </>
+          )}
+          <Text
+            fontWeight={600}
+            color="var(--brandClr)"
+            fontSize="18px"
+            p="5px 20px"
+            mb="10px"
+          >Users: </Text>
+          {searchResult?.map((user) => (<>
+            <UserListItem
+              key={user._id}
+              user={user}
+              handleFunction={() => accessChat(user._id)}
+              type="search"
+            />
+          </>))}
+        </>) : (
+          <Box
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            w="100%"
+            h="100%"
+            color="var(--iconClr)"
+          >
+            No Chats Available!
+          </Box>
         )}
       </Box>
     </Box>

@@ -152,26 +152,23 @@ const SignUp = ({ setActiveComponent }) => {
   return (
     <VStack spacing="5px">
       <Text
-        fontSize="20px"
-        // fontWeight={600}
-        color="#61677c"
+        fontSize="25px"
+        fontWeight={600}
+        color="var(--textClr)"
         mb="20px"
-        textAlign="center"
+        w="100%"
       >
-        Sign Up to start chatting <br />
-        with your friends!
+        Create your account 👏
       </Text>
-      <Box
+      {/* <Box
         mb="15px"
         position="relative"
-        boxShadow="-5px -5px 5px rgba(92, 92, 92, 0.1),
-    10px 10px 10px rgba(0, 0, 0, 0.4), inset -5px -5px 5px rgba(82, 82, 82, 0.2),
-    inset 10px 10px 10px rgba(0, 0, 0, 0.4)"
         w="120px"
         h="120px"
         borderRadius="full"
         overflow="hidden"
         p="6px"
+        border="2px solid var(--textClr)"
       >
         <Image
           src={!pic ? defaultPic : pic}
@@ -195,8 +192,8 @@ const SignUp = ({ setActiveComponent }) => {
             style={{
               fontSize: "30px",
               position: "absolute",
-              top: "35px",
-              left: "35px",
+              top: "45px",
+              left: "45px",
               cursor: "pointer",
             }}
           />
@@ -208,12 +205,15 @@ const SignUp = ({ setActiveComponent }) => {
           onChange={(e) => handleImageChange(e.target.files[0])}
           ref={fileInputRef}
         />
-      </Box>
+      </Box> */}
 
       <FormControl id="first-name" isRequired mb="15px">
         <Input
           focusBorderColor="#54D8FA"
-          placeholder="Name *"
+          placeholder="Name"
+          borderColor="#000"
+          borderWidth="2px"
+          minH="50px"
           onChange={(e) => setName(e.target.value)}
         />
       </FormControl>
@@ -222,7 +222,10 @@ const SignUp = ({ setActiveComponent }) => {
         <InputGroup>
           <Input
             focusBorderColor="#54D8FA"
-            placeholder="Email *"
+            placeholder="Email"
+            borderColor="#000"
+            borderWidth="2px"
+            minH="50px"
             type="email"
             onChange={(e) => setEmail(e.target.value)}
           />
@@ -234,7 +237,10 @@ const SignUp = ({ setActiveComponent }) => {
           <Input
             focusBorderColor="#54D8FA"
             type={show ? "text" : "password"}
-            placeholder="Password *"
+            placeholder="Password"
+            borderColor="#000"
+            borderWidth="2px"
+            minH="50px"
             onChange={(e) => setPassword(e.target.value)}
           />
           <InputRightElement width="3.5rem">
@@ -260,7 +266,10 @@ const SignUp = ({ setActiveComponent }) => {
           <Input
             focusBorderColor="#54D8FA"
             type={show ? "text" : "password"}
-            placeholder="Confirm Password *"
+            placeholder="Confirm Password"
+            borderColor="#000"
+            borderWidth="2px"
+            minH="50px"
             onChange={(e) => setConfirmPassword(e.target.value)}
           />
           <InputRightElement width="3.5rem">
@@ -286,55 +295,37 @@ const SignUp = ({ setActiveComponent }) => {
         style={{ marginTop: 15 }}
         onClick={submitHandler}
         isLoading={loading}
-        boxShadow="-5px -5px 20px rgba(92, 92, 92, 0.1), 5px 5px 20px rgba(0, 0, 0, 0.4)"
-        color="#61677c"
-        bg="transparent"
         minH="50px"
-        border="2px solid #282828"
-        borderRadius="40px"
-        _hover={{
-          boxShadow:
-            "-2px -2px 5px rgba(92, 92, 92, 0.1), 2px 2px 5px rgba(0, 0, 0, 0.4) !important",
-          color: "#54D8FA",
-        }}
-        _active={{
-          boxShadow:
-            "inset 1px 1px 2px rgba(0, 0, 0, 0.4), inset -1px -1px 2px rgba(92, 92, 92, 0.1) !important",
-          color: "#54D8FA50",
-        }}
+        borderRadius="10px"
+        colorScheme="blue"
       >
         Sign Up
       </Button>
-      <Box position="relative" p={10} w="100%">
+      <Box
+        display="flex"
+        justifyContent="center"
+        w="100%"
+        alignItems="center"
+        marginTop="25px"
+      >
+        <Text
+          color="var(--textClr)"
+          mr="5px"
+        >
+          Already have an account?
+        </Text>
+        <Text
+          color="var(--brandClr)"
+          cursor="pointer"
+          fontWeight={600}
+          onClick={() => setActiveComponent("login")}>Login</Text>
+      </Box>
+      {/* <Box position="relative" p={10} w="100%">
         <Divider borderColor="#61677c" />
         <AbsoluteCenter px="4" bg="#1d1e22" color="#61677c">
           Already have an account?
         </AbsoluteCenter>
-      </Box>
-      <Box w="100%">
-        <Button
-          width="100%"
-          onClick={() => setActiveComponent("login")}
-          boxShadow="-5px -5px 20px rgba(92, 92, 92, 0.1), 5px 5px 20px rgba(0, 0, 0, 0.4)"
-          color="#61677c"
-          bg="transparent"
-          minH="50px"
-          border="2px solid #282828"
-          borderRadius="40px"
-          _hover={{
-            boxShadow:
-              "-2px -2px 5px rgba(92, 92, 92, 0.1), 2px 2px 5px rgba(0, 0, 0, 0.4) !important",
-            color: "#54D8FA",
-          }}
-          _active={{
-            boxShadow:
-              "inset 1px 1px 2px rgba(0, 0, 0, 0.4), inset -1px -1px 2px rgba(92, 92, 92, 0.1) !important",
-            color: "#54D8FA50",
-          }}
-        >
-          Login
-        </Button>
-      </Box>
+      </Box> */}
     </VStack>
   );
 };

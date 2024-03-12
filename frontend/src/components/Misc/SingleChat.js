@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { createRef, useCallback, useEffect, useState } from "react";
 import { ChatState } from "../../context/chatProvider";
 import {
   Alert,
@@ -6,10 +6,6 @@ import {
   Button,
   FormControl,
   IconButton,
-  Input,
-  InputGroup,
-  InputLeftElement,
-  InputRightElement,
   Spinner,
   Text,
   useToast,
@@ -27,6 +23,7 @@ import ScrollableChat from "../ScrollableChat";
 import io from "socket.io-client";
 import Lottie from "react-lottie";
 import typingAnimation from "../../animation/typing.json";
+import { HiPlusSm } from "react-icons/hi";
 
 const ENDPOINT = "http://localhost:5000";
 var socket, selectedChatCompare;
@@ -42,7 +39,10 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   const [socketConnected, setSocketConnected] = useState(false);
   const [typing, setTyping] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
+  const [placeholderStatus, setPlaceholderStatus] = useState(true);
   const [typer, setTyper] = useState("");
+
+  const msgDivRef = createRef();
 
   const defaultOptions = {
     loop: true,
@@ -65,8 +65,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     socket.on("stop typing", () => setIsTyping(false));
   }, []);
 
-  const handleTyping = (e) => {
-    setNewMessage(e.target.value);
+  const handleTyping = () => {
 
     if (!socketConnected) return;
     if (!typing) {
@@ -131,14 +130,14 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
       const { data } = await axios.post(
         "/api/message",
         {
-          content: newMessage,
+          content: msgDivRef.current.innerHTML,
           chatId: selectedChat._id,
         },
         config
       );
-      console.log("data", data);
-      setNewMessage("");
       socket.emit("new message", data);
+      msgDivRef.current.innerHTML = "";
+      setFetchAgain(!fetchAgain);
       setMessages([...messages, data]);
     } catch (error) {
       toast({
@@ -173,20 +172,30 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     });
   });
 
+  useEffect(() => {
+    const message = document.getElementsByClassName("message");
+    for (var i = 0; i < message.length; i++) {
+      const imgs = message[i].getElementsByTagName('img');
+      if (message[i].innerText === "" && imgs.length === 1) {
+        imgs[0].classList.add("onlyImage");
+      }
+    }
+  }, [messages])
+
   return (
     <>
       {selectedChat ? (
         <>
           <Text
             fontSize={{ base: "20px", md: "25px" }}
-            p="15px 20px 10px"
+            p="0px 20px"
             w="100%"
             display="flex"
             justifyContent={{ base: "space-between" }}
             alignItems="center"
             bg="inherit"
-            boxShadow="-5px -5px 20px rgba(92, 92, 92, 0.1), 5px 5px 20px rgba(0, 0, 0, 0.4)"
-            borderBottom="2px solid #282828"
+            h="60px"
+            minH="60px"
           >
             <IconButton
               display={{ base: "flex", md: "none" }}
@@ -218,15 +227,11 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             flexDir="column"
             justifyContent="flex-end"
             p={3}
-            // bg="#f0f2f5"
             w="100%"
             h="100%"
-            // borderRadius="20px"
             overflowY="hidden"
-            // boxShadow="-5px -5px 20px rgba(92, 92, 92, 0.1), 5px 5px 20px rgba(0, 0, 0, 0.4)"
-            color="#61677c"
-            bg="transparent"
-            // border="2px solid #282828"
+            color="var(--textClr)"
+            bg="var(--chatBg)"
           >
             {loading ? (
               <Spinner
@@ -267,61 +272,108 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             ) : (
               <></>
             )}
-            {emojiOpen && (
-              <Box>
-                <EmojiPicker
-                  height={300}
-                  width="100%"
-                  onEmojiClick={(emoji) =>
-                    setNewMessage((prevState) => `${prevState + emoji.emoji}`)
-                  }
-                  previewConfig={{ showPreview: false }}
-                />
-              </Box>
-            )}
-            <FormControl
+          </Box>
+          {emojiOpen && (
+            <Box w="100%" position="relative">
+              <EmojiPicker
+                height={300}
+                width="100%"
+                style={{
+                  position: "absolute",
+                  bottom: 0
+                }}
+                emojiStyle="google"
+                searchDisabled
+                onEmojiClick={(emoji) => {
+                  setNewMessage((prevState) => `${prevState + "<img src=" + emoji.imageUrl + " alt=" + emoji.emoji + " class='emoji-msg'  />"}`)
+                  msgDivRef.current?.insertAdjacentHTML('beforeend', "<img src=" + emoji.imageUrl + " alt=" + emoji.emoji + " class='emoji-msg'  />");
+                }}
+                previewConfig={{ showPreview: false }}
+              />
+            </Box>
+          )}
+          <FormControl
+            display="flex"
+            alignItems="center"
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && newMessage) {
+                handleSendMessage();
+              }
+            }}
+            bg="var(--bgClr)"
+            p={2}
+          >
+            <Button
+              size="md"
+              variant="ghost"
+              bg="transparent !important"
+              width="30px"
+              marginRight="5px"
+              p={0}
+              onClick={() => setEmojiOpen(!emojiOpen)}
+            >
+              {emojiOpen ? (
+                <CloseIcon color="#61677c" size="80%" />
+              ) : (
+                <MdOutlineEmojiEmotions size="80%" color="#61677c" />
+              )}
+            </Button>
+            <Button
+              size="md"
+              variant="ghost"
+              bg="transparent !important"
+              width="30px"
+              marginRight="5px"
+              p={0}
+            // onClick={() => setEmojiOpen(!emojiOpen)}
+            >
+              <HiPlusSm size="80%" color="#61677c" />
+            </Button>
+            <Box
+              contentEditable
               display="flex"
-              alignItems="center"
+              flexWrap="wrap"
+              onInput={(e) => {
+                e.currentTarget.innerHTML === ""
+                  ? setPlaceholderStatus(true)
+                  : setPlaceholderStatus(false);
+                handleTyping();
+              }}
+              p="6px 10px"
+              w="100%"
+              borderRadius="10px"
+              bg="var(--white)"
+              focusBorderColor="none !important"
+              borderWidth="0px"
+              outline="none"
+              _focus={{
+                boxShadow: "none"
+              }}
+              ref={msgDivRef}
+              className="msg-box"
+              role="textbox"
               onKeyDown={(e) => {
-                if (e.key === "Enter" && newMessage) {
+                if (e.key == "Enter") {
+                  e.preventDefault();
                   handleSendMessage();
                 }
               }}
+            />
+            {(placeholderStatus && !newMessage) && <Text className="editor-placeholder">Type a message...</Text>}
+            <Button
+              size="md"
+              variant="ghost"
+              bg="transparent !important"
+              width="60px"
+              onClick={handleSendMessage}
+              isDisabled={msgDivRef.current?.innerHTML === ""}
             >
-              <Button
-                size="md"
-                variant="ghost"
-                bg="transparent !important"
-                width="60px"
-                onClick={() => setEmojiOpen(!emojiOpen)}
-              >
-                {emojiOpen ? (
-                  <CloseIcon color="#61677c" />
-                ) : (
-                  <MdOutlineEmojiEmotions fontSize="30px" color="#61677c" />
-                )}
-              </Button>
-              <InputGroup>
-                <Input
-                  placeholder="Type a message"
-                  isRequired
-                  onChange={handleTyping}
-                  value={newMessage}
-                  p="10px"
-                />
-                {newMessage && (
-                  <InputRightElement width="3.5rem" top="6px">
-                    <IoMdSend
-                      fontSize="20px"
-                      color="#54656f"
-                      onClick={handleSendMessage}
-                      cursor="pointer"
-                    />
-                  </InputRightElement>
-                )}
-              </InputGroup>
-            </FormControl>
-          </Box>
+              <IoMdSend
+                fontSize="20px"
+                color="var(--iconClr)"
+              />
+            </Button>
+          </FormControl>
         </>
       ) : (
         <Box
@@ -354,7 +406,8 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             Click on user to start chatting
           </Text>
         </Box>
-      )}
+      )
+      }
     </>
   );
 };

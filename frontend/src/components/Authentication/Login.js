@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { AbsoluteCenter, Box, Divider, VStack } from "@chakra-ui/layout";
+import { AbsoluteCenter, Box, Divider, VStack, Text } from "@chakra-ui/layout";
 import { Button, Image } from "@chakra-ui/react";
 import { FormControl } from "@chakra-ui/form-control";
 import { Input, InputGroup, InputRightElement } from "@chakra-ui/input";
@@ -81,17 +81,30 @@ const Login = ({ setActiveComponent }) => {
 
   return (
     <VStack spacing="5px">
+      <Text
+        fontSize="25px"
+        fontWeight={600}
+        lineHeight="25px"
+        color="var(--textClr)"
+        mb="20px"
+        w="100%"
+      >
+        Welcome Back 👏<br />
+        <small style={{
+          fontSize: "14px"
+
+        }}>Login to your account.</small>
+      </Text>
       <FormControl id="email" isRequired mb="15px">
         <Input
-          focusBorderColor="#54D8FA"
+          focusBorderColor="var(--brandClr)"
           placeholder="Email"
           autoComplete="off"
           capture="user"
           autoFocus="none"
-          _autofill={{
-            boxShadow: `-5px -5px 5px rgba(92, 92, 92, 0.1), 10px 10px 10px rgba(0, 0, 0, 0.4), inset -5px -5px 5px rgba(82, 82, 82, 0.2), inset 10px 10px 10px rgba(0, 0, 0, 0.4) !important`,
-            backgroundColor: "transparent !important",
-          }}
+          borderColor="#000"
+          borderWidth="2px"
+          minH="50px"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
@@ -100,13 +113,16 @@ const Login = ({ setActiveComponent }) => {
       <FormControl id="password" isRequired mb="15px">
         <InputGroup>
           <Input
-            focusBorderColor="#54D8FA"
+            focusBorderColor="var(--brandClr)"
             type={show ? "text" : "password"}
             placeholder="Password"
+            borderColor="#000"
+            borderWidth="2px"
+            minH="50px"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-          <InputRightElement width="3.5rem">
+          <InputRightElement width="3.5rem" top="5px">
             <Button
               h="1.75rem"
               size="sm"
@@ -114,7 +130,6 @@ const Login = ({ setActiveComponent }) => {
               bg="none !important"
               boxShadow="none !important"
               padding="0 !important"
-              margin="8px 15px 0 0"
               _hover={{ bg: "none !important", boxShadow: "none !important" }}
               onClick={handleShowClick}
             >
@@ -129,67 +144,56 @@ const Login = ({ setActiveComponent }) => {
         style={{ marginTop: 15 }}
         onClick={submitHandler}
         isLoading={loading}
-        boxShadow="-5px -5px 20px rgba(92, 92, 92, 0.1), 5px 5px 20px rgba(0, 0, 0, 0.4)"
-        color="#61677c"
-        bg="transparent"
+        color="var(--white)"
         minH="50px"
-        border="2px solid #282828"
-        borderRadius="40px"
-        _hover={{
-          boxShadow:
-            "-2px -2px 5px rgba(92, 92, 92, 0.1), 2px 2px 5px rgba(0, 0, 0, 0.4) !important",
-          color: "#54D8FA",
-        }}
-        _active={{
-          boxShadow:
-            "inset 1px 1px 2px rgba(0, 0, 0, 0.4), inset -1px -1px 2px rgba(92, 92, 92, 0.1) !important",
-          color: "#54D8FA50",
-        }}
+        borderRadius="10px"
+        colorScheme="blue"
       >
         Login
       </Button>
-      <Link
-        style={{
-          width: "100%",
-          textAlign: "right",
-          marginTop: "10px",
-          color: "#61677c",
-          textDecoration: "underline",
-        }}
-        to="/forgot"
+      <Box
+        display="flex"
+        justifyContent="flex-end"
+        w="100%"
+        alignItems="center"
+        marginTop="5px"
       >
-        Forgot Password?
-      </Link>
-      <Box position="relative" p={10} w="100%">
-        <Divider borderColor="#61677c" />
-        <AbsoluteCenter px="4" bg="#1d1e22" color="#61677c" fontWeight={600}>
+        <Text
+          color="var(--textClr)"
+          cursor="pointer"
+          _hover={{
+            color: "var(--brandClr)"
+          }}
+          onClick={() => setActiveComponent("forgot")}
+        >
+          Reset Password
+        </Text>
+      </Box>
+      <Box
+        display="flex"
+        justifyContent="center"
+        w="100%"
+        alignItems="center"
+        marginTop="25px"
+      >
+        <Text
+          color="var(--textClr)"
+          mr="5px"
+        >
+          Don't have an account?
+        </Text>
+        <Text
+          color="var(--brandClr)"
+          cursor="pointer"
+          fontWeight={600}
+          onClick={() => setActiveComponent("signup")}>Sign Up</Text>
+      </Box>
+      {/* <Box position="relative" p={10} w="100%">
+        <Divider borderColor="var(--textClr)" />
+        <AbsoluteCenter px="4" bg="var(--bgClr)" color="var(--textClr)" fontWeight={600}>
           Or
         </AbsoluteCenter>
-      </Box>
-      <Box w="100%" mt="10px">
-        <Button
-          width="100%"
-          onClick={() => setActiveComponent("signup")}
-          boxShadow="-5px -5px 20px rgba(92, 92, 92, 0.1), 5px 5px 20px rgba(0, 0, 0, 0.4)"
-          color="#61677c"
-          bg="transparent"
-          minH="50px"
-          border="2px solid #282828"
-          borderRadius="40px"
-          _hover={{
-            boxShadow:
-              "-2px -2px 5px rgba(92, 92, 92, 0.1), 2px 2px 5px rgba(0, 0, 0, 0.4) !important",
-            color: "#54D8FA",
-          }}
-          _active={{
-            boxShadow:
-              "inset 1px 1px 2px rgba(0, 0, 0, 0.4), inset -1px -1px 2px rgba(92, 92, 92, 0.1) !important",
-            color: "#54D8FA50",
-          }}
-        >
-          Sign Up
-        </Button>
-      </Box>
+      </Box> */}
     </VStack>
   );
 };

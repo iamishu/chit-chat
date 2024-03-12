@@ -39,7 +39,8 @@ const ProfileHead = () => {
         justifyContent="space-between"
         alignItems="center"
         w="100%"
-        p="5px 10px"
+        p="10px 10px"
+        h="60px"
       >
         <Box display="flex" alignItems="center" justifyContent="space-between">
           <Button
@@ -52,14 +53,14 @@ const ProfileHead = () => {
             borderRadius="full"
             bg="none !important"
           >
-            <Avatar name={user.name} src={user.pic} />
+            <Avatar name={user.name} src={user.pic} boxSize="35px" />
           </Button>
         </Box>
         <div>
           <Menu>
             <MenuButton p={1}>
               <NotificationBadge count={notification.length} />
-              <BellIcon fontSize="2xl" m={1} />
+              <BellIcon fontSize="2xl" m={1} color="var(--iconClr)" />
             </MenuButton>
             <MenuList>
               {!notification.length && (
@@ -142,14 +143,14 @@ const ProfileHead = () => {
               ))}
             </MenuList>
           </Menu>
-          <Button
+          {/* <Button
             bg="transparent"
             _hover={{ bg: "transparent" }}
             onClick={onSearchOpen}
             color="inherit"
           >
-            <SearchIcon />
-          </Button>
+            <SearchIcon color="var(--iconClr)" />
+          </Button> */}
         </div>
       </Box>
 

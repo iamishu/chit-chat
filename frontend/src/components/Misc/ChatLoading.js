@@ -3,18 +3,18 @@ import React from "react";
 
 const ChatLoading = () => {
   return (
-    <Stack>
-      <Skeleton height="50px" borderRadius="10px" />
-      <Skeleton height="50px" borderRadius="10px" />
-      <Skeleton height="50px" borderRadius="10px" />
-      <Skeleton height="50px" borderRadius="10px" />
-      <Skeleton height="50px" borderRadius="10px" />
-      <Skeleton height="50px" borderRadius="10px" />
-      <Skeleton height="50px" borderRadius="10px" />
-      <Skeleton height="50px" borderRadius="10px" />
-      <Skeleton height="50px" borderRadius="10px" />
-      <Skeleton height="50px" borderRadius="10px" />
-      <Skeleton height="50px" borderRadius="10px" />
+    <Stack p={2}>
+      <Skeleton height="50px" borderRadius="0px" />
+      <Skeleton height="50px" borderRadius="0px" />
+      <Skeleton height="50px" borderRadius="0px" />
+      <Skeleton height="50px" borderRadius="0px" />
+      <Skeleton height="50px" borderRadius="0px" />
+      <Skeleton height="50px" borderRadius="0px" />
+      <Skeleton height="50px" borderRadius="0px" />
+      <Skeleton height="50px" borderRadius="0px" />
+      <Skeleton height="50px" borderRadius="0px" />
+      <Skeleton height="50px" borderRadius="0px" />
+      <Skeleton height="50px" borderRadius="0px" />
     </Stack>
   );
 };
