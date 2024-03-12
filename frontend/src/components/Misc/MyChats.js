@@ -21,7 +21,7 @@ import ProfileHead from "./ProfileHead";
 import { CloseIcon, Search2Icon } from "@chakra-ui/icons";
 import UserListItem from "./UserListItem";
 import ChatHeads from "./ChatHeads";
-import { searchChats } from "../../helpers/Filters";
+import { filterUsers, searchChats } from "../../helpers/Filters";
 
 const MyChats = ({ fetchAgain }) => {
   const toast = useToast();
@@ -57,6 +57,8 @@ const MyChats = ({ fetchAgain }) => {
     }
   };
 
+  console.log("filterChat", filteredChats);
+
   const handleSearch = async (query) => {
     setSearch(query);
     if (!query) {
@@ -64,7 +66,7 @@ const MyChats = ({ fetchAgain }) => {
       return;
     }
     try {
-      searchChats(query, chats, loggedUser, setFilteredChats);
+      setFilteredChats(searchChats(query, chats, loggedUser));
       setLoading(true);
 
       const config = {
@@ -76,8 +78,9 @@ const MyChats = ({ fetchAgain }) => {
       const { data } = await axios.get(`/api/user?search=${query}`, config);
 
       setLoading(false);
-      setSearchResult(data);
+      setSearchResult(filterUsers(data, chats));
     } catch (error) {
+      console.log(error);
       toast({
         title: "Error Occured!",
         description: "Failed to load the search results.",
@@ -89,7 +92,7 @@ const MyChats = ({ fetchAgain }) => {
     }
   };
 
-  const accessChat = async (userId) => {
+  const accessChat = async (userId, userName) => {
     try {
       setLoadingChat(true);
       const config = {
@@ -99,7 +102,11 @@ const MyChats = ({ fetchAgain }) => {
         },
       };
 
-      const { data } = await axios.post("/api/chat", { userId }, config);
+      const { data } = await axios.post(
+        "/api/chat",
+        { userId, userName },
+        config
+      );
       if (!chats.find((c) => c._id === data._id)) {
         setChats([data, ...chats]);
       }
@@ -107,7 +114,7 @@ const MyChats = ({ fetchAgain }) => {
       setSelectedChat(data);
       setSearch("");
       setSearchResult([]);
-    } catch (error) { }
+    } catch (error) {}
   };
 
   useEffect(() => {
@@ -158,13 +165,20 @@ const MyChats = ({ fetchAgain }) => {
                 onChange={(e) => handleSearch(e.target.value)}
               />
               <InputRightElement right="10px" height="30px">
-                {search && <CloseIcon color="var(--iconClr)" fontSize="14px" cursor="pointer" onClick={() => setSearch("")} />}
+                {search && (
+                  <CloseIcon
+                    color="var(--iconClr)"
+                    fontSize="14px"
+                    cursor="pointer"
+                    onClick={() => setSearch("")}
+                  />
+                )}
               </InputRightElement>
             </InputGroup>
           </FormControl>
         </Box>
         <Divider borderColor="#e9edef" />
-        {(!search && filteredChats) && filteredChats.length > 0 ? (
+        {!search && filteredChats && filteredChats.length > 0 ? (
           <Stack
             overflowY="scroll"
             divider={<StackDivider borderColor="#e9edef" m="0px !important" />}
@@ -173,30 +187,57 @@ const MyChats = ({ fetchAgain }) => {
               <ChatHeads chat={chat} loggedUser={loggedUser} />
             ))}
           </Stack>
-        ) : search && searchResult.length > 0 ? (<>
-          {filteredChats && filteredChats.length > 0 && (
-            <>
-              {filteredChats.map((chat) =>
-                <ChatHeads chat={chat} loggedUser={loggedUser} />
+        ) : search ? (
+          <>
+            {filteredChats && filteredChats.length > 0 && (
+              <>
+                <Text
+                  fontWeight={600}
+                  color="var(--brandClr)"
+                  fontSize="18px"
+                  p="10px 20px"
+                >
+                  Chats:{" "}
+                </Text>
+                {filteredChats.map((chat) => (
+                  <ChatHeads chat={chat} loggedUser={loggedUser} />
+                ))}
+              </>
+            )}
+            <Text
+              fontWeight={600}
+              color="var(--brandClr)"
+              fontSize="18px"
+              p="10px 20px"
+            >
+              Users:{" "}
+            </Text>
+            {searchResult.length > 0 &&
+              searchResult?.map((user) =>
+                user ? (
+                  <>
+                    <UserListItem
+                      key={user?._id}
+                      user={user}
+                      handleFunction={() => accessChat(user?._id, user?.name)}
+                      type="search"
+                    />
+                  </>
+                ) : (
+                  <Box
+                    display="flex"
+                    justifyContent="center"
+                    alignItems="center"
+                    w="100%"
+                    h="100%"
+                    color="var(--iconClr)"
+                  >
+                    Users not found.
+                  </Box>
+                )
               )}
-            </>
-          )}
-          <Text
-            fontWeight={600}
-            color="var(--brandClr)"
-            fontSize="18px"
-            p="5px 20px"
-            mb="10px"
-          >Users: </Text>
-          {searchResult?.map((user) => (<>
-            <UserListItem
-              key={user._id}
-              user={user}
-              handleFunction={() => accessChat(user._id)}
-              type="search"
-            />
-          </>))}
-        </>) : (
+          </>
+        ) : (
           <Box
             display="flex"
             justifyContent="center"
@@ -205,7 +246,7 @@ const MyChats = ({ fetchAgain }) => {
             h="100%"
             color="var(--iconClr)"
           >
-            No Chats Available!
+            Chats not Available!
           </Box>
         )}
       </Box>
