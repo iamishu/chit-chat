@@ -21,27 +21,14 @@ const Chats = () => {
   }, []);
   return (
     <div style={{ width: "100%" }}>
-      <span
-        style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          zIndex: 0,
-          width: "100%",
-          height: "127px",
-          backgroundColor: "var(--brandClr)",
-        }}
-      />
       {/* {user && <SideDrawer />} */}
       <Box
         display="flex"
         justifyContent="space-between"
-        // p="10px"
-        w="calc(100% - 38px)"
+        w="100%"
         maxW="1600px"
-        h="calc(100% - 38px)"
-        maxH="calc(100vh - 38px)"
-        m="19px auto 0"
+        h="100%"
+        maxH="100vh"
         boxShadow="0 6px 48px rgba(11,16,20, .3)"
         zIndex="3"
         bg="#f0f2f5"

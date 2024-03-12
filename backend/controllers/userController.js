@@ -327,7 +327,7 @@ const allUsers = asyncHandler(async (req, res) => {
   const users = await User.find(keyword)
     .find({ _id: { $ne: req.user?._id }, activated: true })
     .select("-password");
-  res.send(users);
+  res.status(200).send(users);
 });
 
 module.exports = {

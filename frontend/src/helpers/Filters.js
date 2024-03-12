@@ -1,12 +1,24 @@
-import { getSender } from "./ChatHelper";
+export const searchChats = (query, chats) => {
+  const lowercasedQuery = query.toLowerCase().trim();
+  const filteredChats = chats.filter((item) => {
+    return Object.keys(item).some((key) =>
+      item.chatName.toString().toLowerCase().includes(lowercasedQuery)
+    );
+  });
+  return filteredChats;
+};
 
-export const searchChats = (query, chats, loggedUser, setFilteredChats) => {
-    const lowercasedQuery = query.toLowerCase().trim();
-    const filteredChats = chats.filter(item => {
-        return Object.keys(item).some(key => {
-            const sender = getSender(loggedUser, item?.users);
-            sender.toString().toLowerCase().includes(lowercasedQuery);
+export const filterUsers = (users, chats) => {
+  const filteredUsers =
+    chats.length > 0
+      ? chats.map((c) => {
+          const lowercasedName = c?.chatName?.toString().toLowerCase().trim();
+          const fUsers = users.filter(
+            (item) => item?.name?.toString().toLowerCase() !== lowercasedName
+          );
+          return fUsers[0];
         })
-    });
-    setFilteredChats(filteredChats);
+      : users;
+  console.log("filteredUsers :: ", filteredUsers);
+  return filteredUsers;
 };
