@@ -98,9 +98,8 @@ const sendVerificationEmail = ({ _id, email, name }, res) => {
     subject: "Verify Your Email - ChitChat",
     html: `<Welcome>Hi ${name}, Welcome to ChitChat!</h3>
     <p>Please verify your email address to complete your signup process and then you can login to ChitChat using your login details.</p>
-    <p>Please Click <a href="${
-      currentUrl + "user/verify/" + _id + "/" + uniqueString
-    }">here</a> to proceed.</p>
+    <p>Please Click <a href="${currentUrl + "user/verify/" + _id + "/" + uniqueString
+      }">here</a> to proceed.</p>
     <br/>
     <b>This verification link will expires in 6 hours. If this link will expires then login into your account to send new verification link.</b>`,
   };
@@ -317,15 +316,21 @@ const authUser = asyncHandler(async (req, res) => {
 const allUsers = asyncHandler(async (req, res) => {
   const keyword = req.query.search
     ? {
-        $or: [
-          { name: { $regex: req.query.search, $options: "i" } },
-          { email: { $regex: req.query.search, $options: "i" } },
-        ],
-      }
+      $or: [
+        { name: { $regex: req.query.search, $options: "i" } },
+        { email: { $regex: req.query.search, $options: "i" } },
+      ],
+    }
     : {};
 
   const users = await User.find(keyword)
-    .find({ _id: { $ne: req.user?._id }, activated: true })
+    .find(
+      {
+        _id: { $ne: req.user?._id },
+        friends: { $not: { $eq: req.user._id } },
+        activated: true
+      }
+    )
     .select("-password");
   res.status(200).send(users);
 });

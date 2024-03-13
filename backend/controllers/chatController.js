@@ -6,10 +6,10 @@ const User = require("../models/userModel");
 //@route           POST /api/chat/
 //@access          Protected
 const accessChat = asyncHandler(async (req, res) => {
-  const { userId, userName } = req.body;
+  const userData = req.body;
 
-  if (!userId) {
-    console.log("UserId param not sent with request");
+  if (!userData) {
+    console.log("userData not sent with request");
     return res.sendStatus(400);
   }
 
@@ -17,7 +17,7 @@ const accessChat = asyncHandler(async (req, res) => {
     isGroupChat: false,
     $and: [
       { users: { $elemMatch: { $eq: req.user._id } } },
-      { users: { $elemMatch: { $eq: userId } } },
+      { users: { $elemMatch: { $eq: userData._id } } },
     ],
   })
     .populate("users", "-password")
@@ -32,17 +32,38 @@ const accessChat = asyncHandler(async (req, res) => {
     res.status(200).send(isChat[0]);
   } else {
     var chatData = {
-      chatName: userName,
+      chatName: userData.name,
+      chatDetails: userData,
       isGroupChat: false,
-      users: [req.user._id, userId],
+      users: [req.user._id, userData._id],
     };
 
     try {
       const createdChat = await Chat.create(chatData);
+      if (createdChat) {
+        await User.findByIdAndUpdate(
+          req.user._id,
+          {
+            $push: { friends: userData },
+          },
+          {
+            new: true
+          }
+        );
+        await User.findByIdAndUpdate(
+          userData._id,
+          {
+            $push: { friends: req.user },
+          },
+          {
+            new: true
+          }
+        );
+      }
       const FullChat = await Chat.findOne({ _id: createdChat._id }).populate(
         "users",
         "-password"
-      );
+      ).populate("chatDetails", "-password");
       res.status(200).json(FullChat);
     } catch (error) {
       res.status(400);
@@ -59,6 +80,7 @@ const fetchChats = asyncHandler(async (req, res) => {
     Chat.find({ users: { $elemMatch: { $eq: req.user._id } } })
       .populate("users", "-password")
       .populate("groupAdmin", "-password")
+      .populate("chatDetails", "-password")
       .populate("latestMessage")
       .populate("chatName")
       .sort({ updatedAt: -1 })
@@ -96,6 +118,7 @@ const createGroupChat = asyncHandler(async (req, res) => {
   try {
     const groupChat = await Chat.create({
       chatName: req.body.name,
+      chatDetails: req.user,
       users: users,
       isGroupChat: true,
       groupAdmin: req.user,
@@ -103,6 +126,7 @@ const createGroupChat = asyncHandler(async (req, res) => {
 
     const fullGroupChat = await Chat.findOne({ _id: groupChat._id })
       .populate("users", "-password")
+      .populate("chatDetails", "-password")
       .populate("groupAdmin", "-password");
 
     res.status(200).json(fullGroupChat);

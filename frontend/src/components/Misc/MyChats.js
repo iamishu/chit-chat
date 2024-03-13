@@ -21,7 +21,7 @@ import ProfileHead from "./ProfileHead";
 import { CloseIcon, Search2Icon } from "@chakra-ui/icons";
 import UserListItem from "./UserListItem";
 import ChatHeads from "./ChatHeads";
-import { filterUsers, searchChats } from "../../helpers/Filters";
+import { searchChats } from "../../helpers/Filters";
 
 const MyChats = ({ fetchAgain }) => {
   const toast = useToast();
@@ -78,7 +78,7 @@ const MyChats = ({ fetchAgain }) => {
       const { data } = await axios.get(`/api/user?search=${query}`, config);
 
       setLoading(false);
-      setSearchResult(filterUsers(data, chats));
+      setSearchResult(data);
     } catch (error) {
       console.log(error);
       toast({
@@ -92,7 +92,7 @@ const MyChats = ({ fetchAgain }) => {
     }
   };
 
-  const accessChat = async (userId, userName) => {
+  const accessChat = async (userData) => {
     try {
       setLoadingChat(true);
       const config = {
@@ -104,7 +104,7 @@ const MyChats = ({ fetchAgain }) => {
 
       const { data } = await axios.post(
         "/api/chat",
-        { userId, userName },
+        userData,
         config
       );
       if (!chats.find((c) => c._id === data._id)) {
@@ -114,7 +114,7 @@ const MyChats = ({ fetchAgain }) => {
       setSelectedChat(data);
       setSearch("");
       setSearchResult([]);
-    } catch (error) {}
+    } catch (error) { }
   };
 
   useEffect(() => {
@@ -212,30 +212,29 @@ const MyChats = ({ fetchAgain }) => {
             >
               Users:{" "}
             </Text>
-            {searchResult.length > 0 &&
+            {searchResult.length > 0 ? (
               searchResult?.map((user) =>
-                user ? (
-                  <>
-                    <UserListItem
-                      key={user?._id}
-                      user={user}
-                      handleFunction={() => accessChat(user?._id, user?.name)}
-                      type="search"
-                    />
-                  </>
-                ) : (
-                  <Box
-                    display="flex"
-                    justifyContent="center"
-                    alignItems="center"
-                    w="100%"
-                    h="100%"
-                    color="var(--iconClr)"
-                  >
-                    Users not found.
-                  </Box>
-                )
-              )}
+                <>
+                  <UserListItem
+                    key={user?._id}
+                    user={user}
+                    handleFunction={() => accessChat(user)}
+                    type="search"
+                  />
+                </>
+              )) : (
+              <Box
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+                w="100%"
+                h="100%"
+                color="var(--iconClr)"
+              >
+                Users not found.
+              </Box>
+            )
+            }
           </>
         ) : (
           <Box

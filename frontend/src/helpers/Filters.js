@@ -7,18 +7,3 @@ export const searchChats = (query, chats) => {
   });
   return filteredChats;
 };
-
-export const filterUsers = (users, chats) => {
-  const filteredUsers =
-    chats.length > 0
-      ? chats.map((c) => {
-          const lowercasedName = c?.chatName?.toString().toLowerCase().trim();
-          const fUsers = users.filter(
-            (item) => item?.name?.toString().toLowerCase() !== lowercasedName
-          );
-          return fUsers[0];
-        })
-      : users;
-  console.log("filteredUsers :: ", filteredUsers);
-  return filteredUsers;
-};
