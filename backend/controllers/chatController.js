@@ -47,7 +47,7 @@ const accessChat = asyncHandler(async (req, res) => {
             $push: { friends: userData },
           },
           {
-            new: true
+            new: true,
           }
         );
         await User.findByIdAndUpdate(
@@ -56,14 +56,13 @@ const accessChat = asyncHandler(async (req, res) => {
             $push: { friends: req.user },
           },
           {
-            new: true
+            new: true,
           }
         );
       }
-      const FullChat = await Chat.findOne({ _id: createdChat._id }).populate(
-        "users",
-        "-password"
-      ).populate("chatDetails", "-password");
+      const FullChat = await Chat.findOne({ _id: createdChat._id })
+        .populate("users", "-password")
+        .populate("chatDetails", "-password");
       res.status(200).json(FullChat);
     } catch (error) {
       res.status(400);
@@ -121,7 +120,7 @@ const createGroupChat = asyncHandler(async (req, res) => {
       chatDetails: req.user,
       users: users,
       isGroupChat: true,
-      groupAdmin: req.user,
+      groupAdmin: [req.user],
     });
 
     const fullGroupChat = await Chat.findOne({ _id: groupChat._id })
@@ -133,6 +132,32 @@ const createGroupChat = asyncHandler(async (req, res) => {
   } catch (error) {
     res.status(400);
     throw new Error(error.message);
+  }
+});
+
+// @desc    Add Group Admin
+// @route   PUT /api/chat/group/addadmin
+// @access  Protected
+const addGroupAdmin = asyncHandler(async (req, res) => {
+  const { chatId, user } = req.body;
+
+  const updatedChat = await Chat.findByIdAndUpdate(
+    chatId,
+    {
+      $push: { groupAdmin: user._id },
+    },
+    {
+      new: true,
+    }
+  )
+    .populate("users", "-password")
+    .populate("groupAdmin", "-password");
+
+  if (!updatedChat) {
+    res.status(404);
+    throw new Error("Chat Not Found");
+  } else {
+    res.status(200).send(updatedChat);
   }
 });
 
@@ -225,4 +250,5 @@ module.exports = {
   renameGroup,
   addToGroup,
   removeFromGroup,
+  addGroupAdmin,
 };
