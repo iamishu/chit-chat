@@ -75,7 +75,10 @@ const MyChats = ({ fetchAgain }) => {
         },
       };
 
-      const { data } = await axios.get(`/api/user?search=${query}`, config);
+      const { data } = await axios.get(
+        `/api/user?search=${query}&searchType=addUser`,
+        config
+      );
 
       setLoading(false);
       setSearchResult(data);
@@ -102,11 +105,7 @@ const MyChats = ({ fetchAgain }) => {
         },
       };
 
-      const { data } = await axios.post(
-        "/api/chat",
-        userData,
-        config
-      );
+      const { data } = await axios.post("/api/chat", userData, config);
       if (!chats.find((c) => c._id === data._id)) {
         setChats([data, ...chats]);
       }
@@ -114,7 +113,7 @@ const MyChats = ({ fetchAgain }) => {
       setSelectedChat(data);
       setSearch("");
       setSearchResult([]);
-    } catch (error) { }
+    } catch (error) {}
   };
 
   useEffect(() => {
@@ -213,7 +212,7 @@ const MyChats = ({ fetchAgain }) => {
               Users:{" "}
             </Text>
             {searchResult.length > 0 ? (
-              searchResult?.map((user) =>
+              searchResult?.map((user) => (
                 <>
                   <UserListItem
                     key={user?._id}
@@ -222,7 +221,8 @@ const MyChats = ({ fetchAgain }) => {
                     type="search"
                   />
                 </>
-              )) : (
+              ))
+            ) : (
               <Box
                 display="flex"
                 justifyContent="center"
@@ -233,8 +233,7 @@ const MyChats = ({ fetchAgain }) => {
               >
                 Users not found.
               </Box>
-            )
-            }
+            )}
           </>
         ) : (
           <Box
