@@ -25,7 +25,7 @@ const UserListItem = ({
   fetchAgain,
 }) => {
   const toast = useToast();
-  const { user: loggedUser, selectedChat } = ChatState();
+  const { user: loggedUser, selectedChat, setSelectedChat } = ChatState();
   const [loading, setLoading] = useState(false);
 
   const makeGroupAdmin = async (u) => {
@@ -62,6 +62,39 @@ const UserListItem = ({
       });
     }
   };
+
+  const handleUserDelete = async (delUser) => {
+    try {
+      setLoading(true);
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      };
+
+      const { data } = await axios.put(
+        "/api/chat/group/remove",
+        {
+          chatId: selectedChat._id,
+          userId: delUser._id,
+        },
+        config
+      );
+      setLoading(false);
+      setSelectedChat(data);
+    } catch (error) {
+      toast({
+        title: "Error Occured!",
+        description: "Failed to remove user.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom-left",
+      });
+    }
+  };
+
   return (
     <>
       <Box
@@ -100,7 +133,7 @@ const UserListItem = ({
               </Text>
             </Box>
             {groupAdmin &&
-            groupAdmin.filter((g) => g._id === user._id).length > 0 ? (
+              groupAdmin.filter((g) => g._id === user._id).length > 0 ? (
               <Box display="flex" flexDir="column" alignItems="flex-end">
                 <Badge
                   ml="1"
@@ -119,7 +152,7 @@ const UserListItem = ({
                       <MenuItem onClick={() => makeGroupAdmin(user)}>
                         Make Group Admin
                       </MenuItem>
-                      <MenuItem>Remove</MenuItem>
+                      <MenuItem onClick={() => handleUserDelete(user)}>Remove</MenuItem>
                     </MenuList>
                   </Menu>
                 )}

@@ -6,6 +6,8 @@ const nodemailer = require("nodemailer");
 const { v4: Uuidv4 } = require("uuid");
 const bcrypt = require("bcrypt");
 const path = require("path");
+const Chat = require("../models/chatModels");
+const Message = require("../models/messageModel");
 
 require("dotenv").config();
 
@@ -98,9 +100,8 @@ const sendVerificationEmail = ({ _id, email, name }, res) => {
     subject: "Verify Your Email - ChitChat",
     html: `<Welcome>Hi ${name}, Welcome to ChitChat!</h3>
     <p>Please verify your email address to complete your signup process and then you can login to ChitChat using your login details.</p>
-    <p>Please Click <a href="${
-      currentUrl + "user/verify/" + _id + "/" + uniqueString
-    }">here</a> to proceed.</p>
+    <p>Please Click <a href="${currentUrl + "user/verify/" + _id + "/" + uniqueString
+      }">here</a> to proceed.</p>
     <br/>
     <b>This verification link will expires in 6 hours. If this link will expires then login into your account to send new verification link.</b>`,
   };
@@ -317,11 +318,11 @@ const authUser = asyncHandler(async (req, res) => {
 const allUsers = asyncHandler(async (req, res) => {
   const keyword = req.query.search
     ? {
-        $or: [
-          { name: { $regex: req.query.search, $options: "i" } },
-          { email: { $regex: req.query.search, $options: "i" } },
-        ],
-      }
+      $or: [
+        { name: { $regex: req.query.search, $options: "i" } },
+        { email: { $regex: req.query.search, $options: "i" } },
+      ],
+    }
     : {};
 
   let users;
@@ -345,6 +346,82 @@ const allUsers = asyncHandler(async (req, res) => {
   res.status(200).send(users);
 });
 
+const fetchAllFriends = asyncHandler(async (req, res) => {
+
+  const users = await User.find({
+    _id: { $ne: req.user?._id },
+    friends: { $elemMatch: { $eq: req.user._id } },
+    activated: true,
+  })
+    .select("-password").then(result => {
+      res.status(200).send(users);
+    }).catch(error => {
+      res.status(400).send(error.message);
+    })
+
+});
+
+const fetchAllUserData = asyncHandler(async (req, res) => {
+
+  let chats = [];
+
+  const friends = await User.find({
+    _id: { $ne: req.user?._id },
+    friends: { $elemMatch: { $eq: req.user._id } },
+    activated: true,
+  })
+
+  await Chat.find({ users: { $elemMatch: { $eq: req.user._id } } })
+    .populate("users", "-password")
+    .populate("groupAdmin", "-password")
+    .populate("chatDetails", "-password")
+    .populate("latestMessage")
+    .populate("chatName")
+    .sort({ updatedAt: -1 })
+    .then(async (results) => {
+      results = await User.populate(results, {
+        path: "latestMessage.sender",
+        select: "name pic email",
+      });
+      chats = results;
+    });
+
+  let currChatMsg = [];
+
+  // const chatMessages = chats.map(async (c) => await chatMsg(c._id).then((msg) => msg).then((msg) => ({ [c._id]: msg })));
+  const messages = await Message.find({ chat: chats.map(c => c._id) })
+    .populate("sender", "name pic email")
+    .populate("chat");
+
+  console.log(messages)
+
+  // fetchMsg().then((data) => {
+  // const newMessages = messages && messages.reduce((acc, el, i) => {
+  //   // console.log("acc", acc);
+  //   const chatId = el.chat?._id;
+  //   if (acc[chatId]) {
+  //     return { ...acc, [chatId]: acc[chatId].concat([el]) };
+  //   }
+  //   return { ...acc, [chatId]: [el] };
+  // });
+  // console.log("chatMessages", newMessages);
+  //   chatMessages = data;
+  // });
+
+  res.send({
+    friends: friends,
+    chats: chats,
+    messages: messages
+  })
+
+});
+
+const chatMsg = async (chatId) => {
+  return await Message.find({ chat: chatId })
+    .populate("sender", "name pic email")
+    .populate("chat");
+}
+
 module.exports = {
   registerUser,
   authUser,
@@ -353,4 +430,6 @@ module.exports = {
   verifyUser,
   sendVerificationEmail,
   resendEmail,
+  fetchAllFriends,
+  fetchAllUserData
 };
