@@ -6,13 +6,7 @@ import SideDrawer from "../components/Misc/ProfileHead";
 import MyChats from "../components/Misc/MyChats";
 import ChatBox from "../components/Misc/ChatBox";
 import { useNavigate } from "react-router-dom";
-
-const idb =
-  window.indexedDB ||
-  window.mozIndexedDB ||
-  window.webkitIndexedDB ||
-  window.msIndexedDB ||
-  window.shimIndexedDB;
+import { IndexedDBService } from "../services/indexedDBService";
 
 const Chats = () => {
   const { user } = ChatState();
@@ -20,43 +14,8 @@ const Chats = () => {
   const [fetchAgain, setFetchAgain] = useState(false);
   const navigate = useNavigate();
 
-  const createIndexedDb = () => {
-    //check for support
-    if (!idb) {
-      console.log("This browser doesn't support IndexedDB");
-      return;
-    }
+  const indexedDBService = new IndexedDBService();
 
-    const request = idb.open("Chit-chat", 1);
-
-    request.onerror = function (event) {
-      console.error("An error occurred with IndexedDB");
-      console.error(event);
-    };
-
-    request.onupgradeneeded = function (event) {
-      console.log(event);
-      const db = request.result;
-
-      if (!db.objectStoreNames.contains("chats")) {
-        const objectStore = db.createObjectStore("chats", { keyPath: "_id" });
-
-        objectStore.createIndex("chatId", "_id", {
-          unique: false,
-        });
-      }
-    };
-
-    request.onsuccess = function () {
-      console.log("Database opened successfully");
-
-      const db = request.result;
-
-      var tx = db.transaction("chats", "readwrite");
-
-      return tx.complete;
-    };
-  }
 
   const fetchChats = async (user) => {
     try {
@@ -65,17 +24,18 @@ const Chats = () => {
           Authorization: `Bearer ${user.token}`,
         },
       };
-      const { data } = await axios.get("/api/chat", config);
-      if (data && data.length > 0) {
-        const dbPromise = idb.open("Chit-chat", 1);
-        dbPromise.onsuccess = () => {
-          const db = dbPromise.result;
-
-          var tx = db.transaction("chats", "readwrite");
-          var chatsData = tx.objectStore("chats");
-          data.forEach((item) => chatsData.add(item));
-          return tx.complete;
-        };
+      const { data } = await axios.get("/api/user/getall", config);
+      if (data && Object.keys(data).length > 0) {
+        const { chats, friends, messages } = data;
+        if (chats && chats.length > 0) {
+          indexedDBService.addChatsData(chats);
+        }
+        if (friends && friends.length > 0) {
+          indexedDBService.addFriendsData(friends);
+        }
+        if (messages && messages.length > 0) {
+          indexedDBService.addMessagesData(messages);
+        }
       }
     } catch (error) {
       console.log(error);
@@ -96,7 +56,7 @@ const Chats = () => {
     if (!user) {
       navigate("/");
     }
-    createIndexedDb();
+    indexedDBService.connectToDB();
     fetchChats(user);
   }, []);
   return (
@@ -108,7 +68,7 @@ const Chats = () => {
         w="100%"
         maxW="1600px"
         h="100%"
-        maxH="100vh"
+        maxH="100%"
         boxShadow="0 6px 48px rgba(11,16,20, .3)"
         zIndex="3"
         bg="#f0f2f5"

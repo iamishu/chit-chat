@@ -9,6 +9,11 @@
   --chatBg: #eae6df;
 }
 
+@font-face {
+  font-family: Poppins;
+  src: url(./Assets/fonts/Poppins/Poppins-Regular.ttf) format("ttf") url(./Assets/fonts/Poppins/Poppins-Bold.ttf) format("ttf") url(./Assets/fonts/Poppins/Poppins-SemiBold.ttf) format("ttf") url(./Assets/fonts/Poppins/Poppins-Medium.ttf) format("ttf") url(./Assets/fonts/Poppins/Poppins-Light.ttf) format("ttf");
+}
+
 * {
   font-family: "Poppins", sans-serif;
   box-sizing: border-box;

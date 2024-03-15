@@ -386,14 +386,10 @@ const fetchAllUserData = asyncHandler(async (req, res) => {
       chats = results;
     });
 
-  let currChatMsg = [];
-
   // const chatMessages = chats.map(async (c) => await chatMsg(c._id).then((msg) => msg).then((msg) => ({ [c._id]: msg })));
   const messages = await Message.find({ chat: chats.map(c => c._id) })
     .populate("sender", "name pic email")
     .populate("chat");
-
-  console.log(messages)
 
   // fetchMsg().then((data) => {
   // const newMessages = messages && messages.reduce((acc, el, i) => {
@@ -415,12 +411,6 @@ const fetchAllUserData = asyncHandler(async (req, res) => {
   })
 
 });
-
-const chatMsg = async (chatId) => {
-  return await Message.find({ chat: chatId })
-    .populate("sender", "name pic email")
-    .populate("chat");
-}
 
 module.exports = {
   registerUser,
